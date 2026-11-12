@@ -1,0 +1,84 @@
+CARA UPLOAD FIRMWARE C210
+=======================
+Board: Arduino Nano (ATmega328P) klon + PCB C210.
+Firmware: Wagiminator v1.3-C210 (SolderingStation2_C210). Hex 23.614 byte (76% flash),
+RAM 52%. Hex ini sudah diverifikasi identik dengan hasil kompilasi ulang source-nya.
+
+SEBELUM COLOK USB — WAJIB:
+  LEPAS jumper J2 di PCB (jumper 5V). Kalau tidak, 5V onboard bertabrakan dengan
+  USB dan bisa merusak regulator/Nano. Pasang lagi setelah upload selesai.
+
+--------------------------------------------------------------------
+CARA 1 — arduino-cli (paling cepat, sudah terpasang di laptop ini)
+--------------------------------------------------------------------
+  # lihat port Nano
+  arduino-cli board list
+
+  # ekstrak sketch-nya dulu
+  unzip -o ~/Downloads/C210/02-firmware-c210.zip -d /tmp/fw
+  unzip -o /tmp/fw/U8glib-1.19.1.zip -d /tmp/fw/libs
+  unzip -o /tmp/fw/Arduino-PID-Library.zip -d /tmp/fw/libs
+
+  # kompilasi (opsional; .hex sudah tersedia kalau mau langsung upload)
+  arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328 \
+      --libraries /tmp/fw/libs /tmp/fw/SolderingStation2_C210
+
+  # upload: bootloader LAMA/klon (umum) -> atmega328old ; bootloader BARU -> atmega328
+  arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:nano:cpu=atmega328old \
+      /tmp/fw/SolderingStation2_C210
+
+--------------------------------------------------------------------
+CARA 2 — flash file .hex langsung dengan avrdude (tanpa kompilasi)
+--------------------------------------------------------------------
+  unzip -o ~/Downloads/C210/02-firmware-c210.zip -d /tmp/fw
+
+  # coba 57600 dulu (bootloader lama), lalu 115200 kalau gagal
+  avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b 57600 \
+          -U flash:w:/tmp/fw/SolderingStation2_C210.hex:i
+
+  # untuk bootloader baru
+  avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b 115200 \
+          -U flash:w:/tmp/fw/SolderingStation2_C210.hex:i
+
+--------------------------------------------------------------------
+CARA 3 — GUI: XLoader atau Arduino IDE (sesuai UPLOAD.md di dalam zip)
+--------------------------------------------------------------------
+  XLoader  : pilih SolderingStation2_C210.hex, Device "Nano (ATmega328)",
+             baud 57600 (gagal -> 115200).
+  IDE      : Sketch -> Include Library -> Add .ZIP Library (U8glib-1.19.1.zip dan
+             Arduino-PID-Library.zip), buka SolderingStation2_C210.ino,
+             Board: Arduino Nano, Processor: ATmega328P (Old Bootloader kalau gagal),
+             lalu Upload.
+
+--------------------------------------------------------------------
+SETELAH UPLOAD
+--------------------------------------------------------------------
+  1. Pasang lagi jumper J2.
+  2. Nyalakan dengan 12V TANPA kartrid: OLED harus tampil suhu + menu,
+     putar encoder mengubah setpoint, tekan lama masuk Setup Menu.
+  3. Pasang gagang + mata C210, lalu KALIBRASI tiap mata:
+     Menu Tip Settings -> Calibrate Tip (3 titik, bandingkan dengan termometer tip).
+     Maksimum 8 profil mata, pilih lewat Change Tip.
+  4. Uji sleep: diamkan 5 menit -> turun ke 150 C; 15 menit -> heater mati.
+     (Butuh saklar getar SW-520D tersambung ke D3/GND, kalau tidak, sleep
+     bergantung pada timer saja.)
+
+--------------------------------------------------------------------
+CATATAN PENTING DARI HASIL PEMERIKSAAN FIRMWARE
+--------------------------------------------------------------------
+  - Pin: A0 sensor suhu, A1 sense tegangan, D5 buzzer, D6 tombol encoder,
+    D7/D8 encoder, D9 PWM heater, D3 saklar getar. Tidak ada bentrok timer
+    (D9 = Timer1, tone() = Timer2, millis() = Timer0).
+  - Pembacaan suhu sudah benar: heater dimatikan dulu, tunggu 300 us, baru baca ADC
+    (wajib untuk kartrid JBC seri-TC).
+  - Saklar getar memakai INPUT_PULLUP -> SW-520D disambung antara D3 dan GND.
+  - TIDAK ADA fail-safe termokopel: kalau termokopel putus / kontak soket jelek,
+    ADC bisa terbaca rendah dan heater terus dipacu. Firmware hanya menampilkan
+    tulisan "ERROR" kalau suhu >500 C, tanpa mematikan pemanas. Proteksi yang ada
+    hanya auto-sleep 5 menit dan auto-off 15 menit.
+    -> Wajib diuji saat commissioning (cabut satu kabel TC saat heater menyala,
+       heater harus berhenti dalam beberapa detik; kalau tidak, jangan dipakai
+       untuk board mahal).
+  - TIDAK ADA proteksi tegangan input (nilai Vin hanya ditampilkan, tanpa cutoff).
+  - Konstanta PID berasal dari desain asli (daya lebih besar). Di 12V (~17 W)
+    respon lebih lambat; kalau ada overshoot/lambat, tweak aggKp/aggKi/aggKd.
