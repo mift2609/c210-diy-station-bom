@@ -27,3 +27,7 @@ Arduino Nano / ATmega328P + LMV358, ditujukan untuk service HP dan elektronik ke
 5. Kalau OPA2387 dipasang menggantikan LMV358, kalibrasi wajib diulang.
 
 Catatan: seluruh angka harga adalah estimasi snapshot dan perlu dicek ulang saat membeli.
+
+## Live
+
+Checklist interaktif: https://mift2609.github.io/c210-diy-station-bom/
