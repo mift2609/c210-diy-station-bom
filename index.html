@@ -147,7 +147,7 @@ SECTIONS.forEach(sec => {
     if (it.note) { cmp.querySelector(".note").textContent = it.note; cmp.querySelector(".note").className = "note" + (/WAJIB|JANGAN|harus|jangan/.test(it.note) ? " warn" : ""); }
     tr.appendChild(cmp);
 
-    const qty = document.createElement("td"); qty.className = "n"; qty.textContent = it.qty || 1; tr.appendChild(qty);
+    const qty = document.createElement("td"); qty.className = "n"; qty.textContent = (it.qty === undefined ? 1 : it.qty); tr.appendChild(qty);
 
     const priceCells = [];
     const mk = (val, field) => {
@@ -187,7 +187,7 @@ function render() {
   document.querySelectorAll("tr[data-k]").forEach(tr => {
     const [secId, idx] = tr.dataset.k.split(":");
     const sec = SECTIONS.find(s => s.id === secId), it = sec.items[Number(idx)], st = state[tr.dataset.k] || {};
-    const qty = it.qty || 1;
+    const qty = (it.qty === undefined ? 1 : it.qty);
     const cb = tr.querySelector("input[type=checkbox]");
     tr.className = cb.checked ? "done" : "";
     if (sec.optional) { totalN++; if (cb.checked) { upN++; upSum += (st.price !== undefined ? st.price : it.price) * qty; } return; }
