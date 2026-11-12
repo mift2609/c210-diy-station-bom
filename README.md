@@ -28,6 +28,19 @@ Arduino Nano / ATmega328P + LMV358, ditujukan untuk service HP dan elektronik ke
 
 Catatan: seluruh angka harga adalah estimasi snapshot dan perlu dicek ulang saat membeli.
 
+## Catatan gerber (penting)
+
+File gerber asli yang beredar untuk board ini punya **cacat ekspor**: layer solder
+mask (`F_Mask`/`B_Mask`) hanya memuat 56 bukaan untuk pad through-hole dan mounting
+hole, sedangkan **pad SMD tidak punya bukaan sama sekali** (F_Cu punya 209 pad,
+F_Mask hanya 56 objek; pad SMD terlihat tertutup mask pada render). Preview desainer
+sendiri menunjukkan pad SMD terbuka, jadi ini murni cacat ekspor, bukan salah desain.
+
+Kalau diorder apa adanya, pad SMD akan tertutup solder mask dan tidak bisa disolder.
+Dua jalan keluar: minta desainer ekspor ulang gerber, atau pakai versi perbaikan
+(mask di-generate ulang dari copper: bukaan THT dipertahankan + bukaan pad SMD
+ditambahkan dengan ekspansi 0,1 mm, via tetap tertutup).
+
 ## Live
 
 Checklist interaktif: https://mift2609.github.io/c210-diy-station-bom/
