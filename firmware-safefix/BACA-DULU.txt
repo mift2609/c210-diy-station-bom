@@ -1,0 +1,92 @@
+FIRMWARE C210 — VARIAN FAIL-SAFE (patch)
+========================================
+Folder : 08-firmware-safefix/
+Isi    : SolderingStation2_C210_safefix.hex      <- siap flash
+         SolderingStation2_C210_safefix/         <- source (sketch folder)
+Basis  : SolderingStation2_C210 (Wagiminator v1.3-C210) yang asli, TIDAK diubah.
+         Folder 02-firmware-c210.zip tetap asli sebagai pembanding.
+
+------------------------------------------------------------------------
+APA YANG DITAMBAHKAN (pemanas dikunci OFF saat fault)
+------------------------------------------------------------------------
+  FAULT 1 — suhu di luar jangkauan
+      Pembacaan > 500 C (termokopel putus / rusak / kontak kartrid jelek yang
+      membuat output op-amp jenuh tinggi).
+      Tampilan OLED: "FLT1"
+
+  FAULT 2 — pemanas jalan tapi suhu tidak naik
+      Pemanas diminta duty penuh (setpoint >30 C di atas suhu aktual) tetapi
+      suhu tidak naik 3 C dalam 3 detik, terjadi 2 kali berturut-turut (~6 detik).
+      Ini menangkap kasus termokopel putus yang terbaca RENDAH, kontak soket
+      kartrid jelek, dan kartrid yang tidak terpasang.
+      Tampilan OLED: "FLT2"
+
+  FAULT 3 — tegangan input terlalu tinggi
+      Vin > 15,5 V. Board ini desain 12 V (MOSFET IRLR7843 hanya 30 V, dan
+      78M05 akan panas berlebih di 24 V). Ini mencegah kecelakaan "kok tidak
+      panas, saya naikkan adaptornya jadi 24 V".
+      Tampilan OLED: "FLT3"
+
+  Perilaku saat fault:
+    - PID dilewati, PWM dipaksa 255 (= pemanas OFF pada rangkaian ini),
+      sehingga tidak ada jalan bagi PID untuk menyalakan pemanas lagi.
+    - Buzzer berbunyi dua kali saat fault terjadi.
+    - Kunci fault bersifat latch: pemanas tidak akan menyala lagi sampai
+      kamu menekan tombol encoder (acknowledge), lalu beep sekali.
+
+  Yang TIDAK diubah: kurva kalibrasi, konstanta PID (agg/cons), timer sleep,
+  menu, penyimpanan EEPROM. Jadi hasil soldernya identik dengan aslinya,
+  hanya bertambah pengaman.
+
+------------------------------------------------------------------------
+ANGKA HASIL KOMPILASI
+------------------------------------------------------------------------
+  Asli       : 23.614 byte flash (76%), RAM 1.065 byte (52%)
+  Fail-safe  : 24.260 byte flash (78%), RAM 1.074 byte (52%)
+  -> +646 byte, masih sisa ~6,4 KB. Hex 1.518 record, 0 checksum rusak,
+     alamat 0x0000..0x5EC4 (tidak menyentuh bootloader, aman flash via USB).
+
+------------------------------------------------------------------------
+CARA FLASH
+------------------------------------------------------------------------
+  LEPAS dulu jumper J2 di PCB, pasang lagi setelah upload selesai.
+
+  Pakai arduino-cli:
+     arduino-cli board list
+     arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:nano:cpu=atmega328old \
+         ~/Downloads/C210/08-firmware-safefix/SolderingStation2_C210_safefix
+     (ganti cpu=atmega328old -> cpu=atmega328 kalau Nano-mu bootloader baru)
+
+  Pakai hex langsung (avrdude):
+     avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b 57600 \
+        -U flash:w:$HOME/Downloads/C210/08-firmware-safefix/SolderingStation2_C210_safefix.hex:i
+     (gagal? coba baud 115200)
+
+  Atau XLoader: pilih file .hex di atas, device "Nano (ATmega328)", baud 57600.
+
+------------------------------------------------------------------------
+UJI WAJIB SETELAH FLASH (jangan dilewat)
+------------------------------------------------------------------------
+  1. Normal dulu: 12 V, tanpa kartrid -> OLED tampil suhu + menu.
+     Set 320 C, pasang kartrid -> suhu naik normal, tidak muncul FLT2.
+     (Kalau FLT2 muncul saat seharusnya normal, berarti kenaikan suhu di
+      rangkaianmu memang < 3 C / 3 s -> kemungkinan adaptor kurang kuat atau
+      kontak soket jelek. Lapor saja, ambangnya bisa saya longgarkan.)
+  2. UJI TERMOKOPEL PUTUS (yang paling penting):
+     Saat pemanas sedang bekerja, cabut salah satu kabel termokopel di gagang
+     (atau lepas kartrid saat pemanas menyala). Harus muncul FLT1 atau FLT2
+     dan pemanas benar-benar berhenti (tip mendingin, tidak membara).
+     Tekan tombol encoder -> fault lepas, station kembali normal.
+  3. UJI OVERVOLTAGE: ganti adaptor ke 19-24 V -> harus muncul FLT3 dan
+     pemanas tidak menyala. Kembalikan ke 12 V, tekan tombol, lanjut.
+
+  Catatan jujur: firmware ini saya compile bersih dan saya periksa baris demi
+  baris, TAPI belum diuji di hardware (tidak ada board-nya di sini). Angka
+  ambang (3 C / 3 s, 15,5 V, latch tombol) bisa disetel ulang sesuai hasil
+  ujianmu di poin 1-3.
+
+------------------------------------------------------------------------
+SETELAH ITU
+------------------------------------------------------------------------
+  Kalibrasi tiap mata solder (menu Tip Settings -> Calibrate Tip, 3 titik),
+  lalu tes sleep (5 menit) dan auto-off (15 menit).
