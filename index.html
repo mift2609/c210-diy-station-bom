@@ -50,7 +50,7 @@
 </head>
 <body>
   <h1>Checklist Belanja — Station Solder C210 DIY</h1>
-  <div class="sub">Arduino Nano (ATmega328P) + LMV358 · untuk service HP &amp; elektronik kecil · harga = estimasi, bisa diedit langsung di kolom harga.</div>
+  <div class="sub">Arduino Nano (ATmega328P) + LMV358 &middot; <b>12 V only</b> (kartrid C210 ~8,5&nbsp;&Omega; &rarr; ~17&nbsp;W ke tip, heat-up 15&ndash;20&nbsp;s) &middot; untuk service HP &amp; elektronik kecil &middot; harga = estimasi, bisa diedit di kolom harga.</div>
 
   <div class="bar">
     <button id="copyPending">Salin yang belum dicentang</button>
@@ -64,7 +64,9 @@
 
   <div class="totals" id="totals"></div>
   <div class="legend">
-    Syarat keamanan (jangan dilewat): PSU harus <b>SELV/floating</b> (jangan yang outputnya terhubung ke earth), dan kabel <b>earth dari soket kartrid ke chassis</b> wajib ada &mdash; target ukur: tip-ke-earth &lt;2&nbsp;Ω dan bocor &lt;2&nbsp;mV.
+    <b>Wajib 12 V.</b> Jangan beri 24 V: MOSFET IRLR7843 hanya 30 V, 78M05 jadi 1,4 W+, dan daya ke tip naik 4&times; tanpa pembatas daya di firmware. Sekring: pakai <b>2&ndash;3 A fast</b> &mdash; silkscreen PCB menulis &ldquo;FUSE 8A&rdquo; (desain asli), tapi arus kerja di 12 V hanya ~1,4 A.<br>
+    Syarat keamanan (jangan dilewat): PSU harus <b>SELV/floating</b> (jangan yang outputnya terhubung ke earth), dan kabel <b>earth dari soket kartrid ke chassis</b> wajib ada (pin &ldquo;E&rdquo; di J3) &mdash; target ukur: tip-ke-earth &lt;2&nbsp;&Omega; dan bocor &lt;2&nbsp;mV.<br>
+    Kartrid: <b>hanya C210</b> &mdash; kurva kalibrasi dan batas daya firmware di-set untuk C210.
   </div>
 
 <script>
@@ -85,7 +87,7 @@ const SECTIONS = [
     { name: "SS54 (SMA)", spec: "dioda SS54 SMD", qty: 1, price: 1000 },
     { name: "1N4148W (SOD-123)", spec: "1N4148W SOD-123", qty: 1, price: 500 },
     { name: "Zener 5V1 (SOD-123)", spec: "zener 5V1 SOD-123", qty: 1, price: 500 },
-    { name: "Zener 18V (SOD-123)", spec: "zener 18V SOD-123", qty: 1, price: 500, note: "opsional, di 12V boleh tidak dipasang" },
+    { name: "Zener 18V (SOD-123)", spec: "zener 18V SOD-123", qty: 0, price: 500, note: "TIDAK dipakai di 12V (tidak konduksi) — hanya untuk versi 24V" },
     { name: "Paket R/C SMD", spec: "resistor 0805 kit assorted", qty: 1, price: 20000, note: "10k×8, 1k, 200k, 47k, 1k 1206, 100n×2, 330n, 2n2, 10µF/35V, 22µF/35V, 1µF/35V" },
   ]},
   { id: "tht", title: "THT (yang nancap)", items: [
@@ -93,7 +95,7 @@ const SECTIONS = [
     { name: "Buzzer MLT-5030 pasif 5V", spec: "buzzer smd 5030 passive", qty: 1, price: 5000, note: "harus PASIF, bukan aktif" },
     { name: "Terminal KF350 2 pin", spec: "terminal KF350 2 pin", qty: 1, price: 2000 },
     { name: "Terminal KF350 5 pin", spec: "terminal KF350 5 pin", qty: 1, price: 3000, note: "5 pin = syarat kabel earth tip" },
-    { name: "Sekring kaca 5×20", spec: "sekring kaca 5x20 3A", qty: 1, price: 2000, note: "kalau 24V pakai 3A fast, bukan 8A" },
+    { name: "Sekring kaca 5×20 (2–3 A fast)", spec: "sekring kaca 5x20 3A fast", qty: 1, price: 2000, note: "silk PCB tulis 'FUSE 8A' — di 12V arus kerja ~1,4 A, jadi 2–3 A fast" },
     { name: "Klip sekring PCB 5×20", spec: "klip sekring pcb 5x20", qty: 1, price: 6000 },
     { name: "Pin header female 1×40", spec: "pin header female 1x40 2.54", qty: 1, price: 3000, note: "potong jadi 2×15 untuk socket Nano" },
     { name: "Pin header male 1×2 + jumper", spec: "pin header male 1x2 2.54", qty: 1, price: 1000 },
@@ -105,16 +107,16 @@ const SECTIONS = [
     { name: "Gagang: kabel silikon 4-5 core 1,5 m", spec: "kabel silikon 4 core 20awg", qty: 1, min: 15000, max: 40000, note: "bukan PVC" },
     { name: "Gagang: bodi/grip", spec: "3d print grip solder aluminium tube", qty: 1, min: 15000, max: 40000, note: "print sendiri bisa lebih murah" },
     { name: "Gagang: konektor + strain relief", spec: "GX12 5 pin", qty: 1, min: 15000, max: 30000, note: "plus heat shrink/gland" },
-    { name: "PSU 24V 5A (SELV/floating)", spec: "adaptor 24V 5A", qty: 1, min: 80000, max: 150000, note: "WAJIB bukan yang earth-referenced" },
+    { name: "PSU 12V 4–5A (SELV/floating)", spec: "adaptor 12V 5A", qty: 1, min: 60000, max: 120000, note: "12V (bukan 24V). Kerja hanya ~1,4 A, ambil ≥3 A" },
+    { name: "Gagang: saklar getar SW-520D", spec: "saklar getar sw-520d", qty: 1, min: 3000, max: 8000, note: "WAJIB untuk fitur sleep: firmware pakai D3 → pin 4 (SW) di J3" },
     { name: "Stand besi + sponge", spec: "stand besi solder sponge", qty: 1, min: 20000, max: 50000 },
     { name: "Enclosure + sekrup + kabel", spec: "box elektronik proyek sekrup m2.5", qty: 1, min: 30000, max: 70000 },
   ]},
   { id: "upgrade", title: "Upgrade opsional (urutan prioritas)", optional: true, items: [
     { name: "Kabel earth tip → chassis → PE", spec: "kabel silikon 22awg", qty: 1, price: 5000, note: "WAJIB kalau dipakai untuk board HP" },
     { name: "OPA2387 ganti LMV358", spec: "OPA2387 SOIC-8", qty: 1, price: 50000, note: "zero-drift, GBW 5,7MHz; kalibrasi ulang" },
-    { name: "Buck 5V ganti 78M05", spec: "modul MP1584 step down", qty: 1, price: 12000, note: "set 5,0V" },
-    { name: "MOSFET ≥40V (kalau 24V)", spec: "mosfet TO-252 40V logic level", qty: 1, price: 15000 },
-    { name: "Snubber + TVS output heater", spec: "TVS TVS diode SMA", qty: 1, price: 5000 },
+    { name: "Buck 5V ganti 78M05", spec: "modul MP1584 step down", qty: 1, price: 12000, note: "di 12V 78M05 cuma ~0,5W — ini kenyamanan, bukan keharusan" },
+    { name: "Snubber + TVS output heater", spec: "TVS diode SMA", qty: 1, price: 5000, note: "opsional di 12V, wajib kalau pindah 24V" },
   ]},
 ];
 
