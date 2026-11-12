@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checklist Belanja — Station Solder C210 DIY</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    color: var(--foreground, #1a1a1a);
+    font-family: var(--font-family, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+    margin: 0 auto; max-width: 980px; padding: 14px 16px 40px; font-size: 14px; line-height: 1.45;
+  }
+  h1 { font-size: 19px; margin: 0 0 2px; }
+  h2 { font-size: 14px; margin: 22px 0 6px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-foreground, #666); }
+  .sub { color: var(--muted-foreground, #666); font-size: 12.5px; margin-bottom: 12px; }
+  .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 4px; }
+  button {
+    font: inherit; font-size: 12.5px; padding: 6px 11px; cursor: pointer;
+    color: var(--foreground, #1a1a1a); background: var(--card, #f4f4f5);
+    border: 1px solid var(--border, #d4d4d8); border-radius: 7px;
+  }
+  button:hover { border-color: var(--accent, #71717a); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 6px 7px; border-bottom: 1px solid var(--border, #e4e4e7); vertical-align: top; }
+  th { font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted-foreground, #666); font-weight: 600; }
+  td.n, th.n { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td.c { text-align: center; }
+  .name { font-weight: 600; }
+  .spec { color: var(--muted-foreground, #666); font-size: 12.5px; }
+  .note { color: var(--muted-foreground, #666); font-size: 12px; }
+  .warn { color: #b45309; font-size: 12px; }
+  input[type=number] {
+    width: 92px; font: inherit; font-size: 12.5px; text-align: right; padding: 4px 5px;
+    color: var(--foreground, #1a1a1a); background: transparent;
+    border: 1px solid var(--border, #d4d4d8); border-radius: 6px; font-variant-numeric: tabular-nums;
+  }
+  input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent, #2563eb); }
+  tr.done .name, tr.done .spec { text-decoration: line-through; opacity: .55; }
+  tr.done { background: color-mix(in srgb, var(--accent, #2563eb) 7%, transparent); }
+  a.lnk { font-size: 12px; color: var(--accent, #2563eb); text-decoration: none; border-bottom: 1px dotted currentColor; }
+  a.lnk:hover { text-decoration: underline; }
+  .totals { margin-top: 22px; border: 1px solid var(--border, #e4e4e7); border-radius: 10px; padding: 12px 14px; }
+  .totals div { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+  .totals .big { font-weight: 700; font-size: 15px; border-top: 1px solid var(--border, #e4e4e7); margin-top: 6px; padding-top: 8px; }
+  .legend { font-size: 12px; color: var(--muted-foreground, #666); margin-top: 8px; }
+  .ok { color: #15803d; }
+  @media print { button, input[type=number] { display: none; } }
+</style>
+</head>
+<body>
+  <h1>Checklist Belanja — Station Solder C210 DIY</h1>
+  <div class="sub">Arduino Nano (ATmega328P) + LMV358 · untuk service HP &amp; elektronik kecil · harga = estimasi, bisa diedit langsung di kolom harga.</div>
+
+  <div class="bar">
+    <button id="copyPending">Salin yang belum dicentang</button>
+    <button id="copyAll">Salin semua kata kunci</button>
+    <button id="expandAll">Buka semua link Shopee</button>
+    <button id="reset">Reset centang</button>
+  </div>
+  <div class="legend" id="progress"></div>
+
+  <div id="app"></div>
+
+  <div class="totals" id="totals"></div>
+  <div class="legend">
+    Syarat keamanan (jangan dilewat): PSU harus <b>SELV/floating</b> (jangan yang outputnya terhubung ke earth), dan kabel <b>earth dari soket kartrid ke chassis</b> wajib ada &mdash; target ukur: tip-ke-earth &lt;2&nbsp;Ω dan bocor &lt;2&nbsp;mV.
+  </div>
+
+<script>
+const IDR = n => "Rp" + Math.round(n).toLocaleString("id-ID");
+const SH = "https://shopee.co.id/search?keyword=";
+const q = s => SH + encodeURIComponent(s);
+
+const SECTIONS = [
+  { id: "otak", title: "Otak & tampilan", items: [
+    { name: "Arduino Nano V3 clone", spec: "arduino nano v3 ch340", qty: 1, price: 44000, note: "cek chip CH340 vs FTDI" },
+    { name: 'OLED 0,96" SSD1306 I2C 4 pin', spec: "oled 0.96 ssd1306 i2c", qty: 1, price: 37000, note: "urutan pin harus GND-VCC-SCL-SDA" },
+  ]},
+  { id: "smd", title: "SMD (disolder di board)", items: [
+    { name: "LMV358 (SOIC-8)", spec: "LMV358 SOIC-8", qty: 1, price: 4000, note: "opsional: ganti OPA2387 (lihat Upgrade)" },
+    { name: "IRLR7843 (TO-252)", spec: "IRLR7843 TO-252", qty: 1, price: 12000, note: "30V — aman di 12V, di 24V ganti ≥40V" },
+    { name: "FMMT619 (SOT-23)", spec: "FMMT619", qty: 1, price: 4000, note: "jangan diganti tipe lain" },
+    { name: "78M05 (TO-252)", spec: "78M05 TO-252", qty: 1, price: 4000, note: "boros panas di 24V; idealnya buck" },
+    { name: "SS54 (SMA)", spec: "dioda SS54 SMD", qty: 1, price: 1000 },
+    { name: "1N4148W (SOD-123)", spec: "1N4148W SOD-123", qty: 1, price: 500 },
+    { name: "Zener 5V1 (SOD-123)", spec: "zener 5V1 SOD-123", qty: 1, price: 500 },
+    { name: "Zener 18V (SOD-123)", spec: "zener 18V SOD-123", qty: 1, price: 500, note: "opsional, di 12V boleh tidak dipasang" },
+    { name: "Paket R/C SMD", spec: "resistor 0805 kit assorted", qty: 1, price: 20000, note: "10k×8, 1k, 200k, 47k, 1k 1206, 100n×2, 330n, 2n2, 10µF/35V, 22µF/35V, 1µF/35V" },
+  ]},
+  { id: "tht", title: "THT (yang nancap)", items: [
+    { name: "Rotary encoder EC11 + knob", spec: "rotary encoder ec11 tombol", qty: 1, price: 10000 },
+    { name: "Buzzer MLT-5030 pasif 5V", spec: "buzzer smd 5030 passive", qty: 1, price: 5000, note: "harus PASIF, bukan aktif" },
+    { name: "Terminal KF350 2 pin", spec: "terminal KF350 2 pin", qty: 1, price: 2000 },
+    { name: "Terminal KF350 5 pin", spec: "terminal KF350 5 pin", qty: 1, price: 3000, note: "5 pin = syarat kabel earth tip" },
+    { name: "Sekring kaca 5×20", spec: "sekring kaca 5x20 3A", qty: 1, price: 2000, note: "kalau 24V pakai 3A fast, bukan 8A" },
+    { name: "Klip sekring PCB 5×20", spec: "klip sekring pcb 5x20", qty: 1, price: 6000 },
+    { name: "Pin header female 1×40", spec: "pin header female 1x40 2.54", qty: 1, price: 3000, note: "potong jadi 2×15 untuk socket Nano" },
+    { name: "Pin header male 1×2 + jumper", spec: "pin header male 1x2 2.54", qty: 1, price: 1000 },
+  ]},
+  { id: "offpcb", title: "Off-PCB & gagang DIY", range: true, items: [
+    { name: "PCB fab 2 layer (5 pcs + ongkir)", spec: "jasa cetak pcb gerber jlcpcb", qty: 1, min: 60000, max: 150000, note: "gerber → JLCPCB/PCBWay" },
+    { name: "Tip / kartrid C210 klon", spec: "kartrid C210", qty: 1, min: 70000, max: 180000, note: "kualitas tip menentukan hasil" },
+    { name: "Gagang: soket/kontak kartrid", spec: "socket mata solder T210 sparepart", qty: 1, min: 40000, max: 120000, note: "JANGAN bikin kontak sendiri" },
+    { name: "Gagang: kabel silikon 4-5 core 1,5 m", spec: "kabel silikon 4 core 20awg", qty: 1, min: 15000, max: 40000, note: "bukan PVC" },
+    { name: "Gagang: bodi/grip", spec: "3d print grip solder aluminium tube", qty: 1, min: 15000, max: 40000, note: "print sendiri bisa lebih murah" },
+    { name: "Gagang: konektor + strain relief", spec: "GX12 5 pin", qty: 1, min: 15000, max: 30000, note: "plus heat shrink/gland" },
+    { name: "PSU 24V 5A (SELV/floating)", spec: "adaptor 24V 5A", qty: 1, min: 80000, max: 150000, note: "WAJIB bukan yang earth-referenced" },
+    { name: "Stand besi + sponge", spec: "stand besi solder sponge", qty: 1, min: 20000, max: 50000 },
+    { name: "Enclosure + sekrup + kabel", spec: "box elektronik proyek sekrup m2.5", qty: 1, min: 30000, max: 70000 },
+  ]},
+  { id: "upgrade", title: "Upgrade opsional (urutan prioritas)", optional: true, items: [
+    { name: "Kabel earth tip → chassis → PE", spec: "kabel silikon 22awg", qty: 1, price: 5000, note: "WAJIB kalau dipakai untuk board HP" },
+    { name: "OPA2387 ganti LMV358", spec: "OPA2387 SOIC-8", qty: 1, price: 50000, note: "zero-drift, GBW 5,7MHz; kalibrasi ulang" },
+    { name: "Buck 5V ganti 78M05", spec: "modul MP1584 step down", qty: 1, price: 12000, note: "set 5,0V" },
+    { name: "MOSFET ≥40V (kalau 24V)", spec: "mosfet TO-252 40V logic level", qty: 1, price: 15000 },
+    { name: "Snubber + TVS output heater", spec: "TVS TVS diode SMA", qty: 1, price: 5000 },
+  ]},
+];
+
+const KEY = "c210-bom-v1";
+let state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { state = {}; }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const rowKey = (s, i) => s + ":" + i;
+
+const app = document.getElementById("app");
+SECTIONS.forEach(sec => {
+  const h = document.createElement("h2");
+  h.textContent = sec.title;
+  app.appendChild(h);
+  const t = document.createElement("table");
+  t.innerHTML = "<thead><tr><th class='c'>&#10003;</th><th>Komponen</th><th class='n'>Qty</th>" +
+    (sec.range ? "<th class='n'>Harga min</th><th class='n'>Harga max</th>" : "<th class='n'>Harga</th>") +
+    "<th>Kata kunci / link</th></tr></thead>";
+  const tb = document.createElement("tbody");
+  sec.items.forEach((it, i) => {
+    const k = rowKey(sec.id, i), st = state[k] || {};
+    const tr = document.createElement("tr");
+    tr.dataset.k = k;
+    const cmp = document.createElement("td");
+    cmp.innerHTML = "<div class='name'></div><div class='spec'></div>" + (it.note ? "<div class='note'></div>" : "");
+    cmp.querySelector(".name").textContent = it.name;
+    cmp.querySelector(".spec").textContent = it.spec;
+    if (it.note) { cmp.querySelector(".note").textContent = it.note; cmp.querySelector(".note").className = "note" + (/WAJIB|JANGAN|harus|jangan/.test(it.note) ? " warn" : ""); }
+    tr.appendChild(cmp);
+
+    const qty = document.createElement("td"); qty.className = "n"; qty.textContent = it.qty || 1; tr.appendChild(qty);
+
+    const priceCells = [];
+    const mk = (val, field) => {
+      const td = document.createElement("td"); td.className = "n";
+      const inp = document.createElement("input");
+      inp.type = "number"; inp.min = "0"; inp.step = "500";
+      inp.value = st[field] !== undefined ? st[field] : val;
+      inp.addEventListener("input", () => { state[k] = Object.assign({}, state[k], {[field]: Number(inp.value) || 0}); save(); render(); });
+      td.appendChild(inp); priceCells.push(inp); return td;
+    };
+    if (sec.range) { tr.appendChild(mk(it.min, "min")); tr.appendChild(mk(it.max, "max")); }
+    else tr.appendChild(mk(it.price, "price"));
+
+    const lk = document.createElement("td");
+    const a = document.createElement("a");
+    a.className = "lnk"; a.target = "_blank"; a.rel = "noopener";
+    a.href = q(it.spec); a.textContent = "Shopee ↗";
+    a.dataset.q = it.spec;
+    lk.appendChild(a);
+    tr.appendChild(lk);
+
+    const cbTd = document.createElement("td"); cbTd.className = "c";
+    const cb = document.createElement("input"); cb.type = "checkbox";
+    cb.checked = !!(state[k] && state[k].done);
+    cb.addEventListener("change", () => { state[k] = Object.assign({}, state[k], {done: cb.checked}); save(); render(); });
+    cbTd.appendChild(cb);
+    tr.insertBefore(cbTd, tr.firstChild);
+    tr.className = cb.checked ? "done" : "";
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb); app.appendChild(t);
+});
+
+function render() {
+  let wajib = 0, checkedSum = 0, checkedN = 0, totalN = 0;
+  let offMin = 0, offMax = 0, upSum = 0, upN = 0;
+  document.querySelectorAll("tr[data-k]").forEach(tr => {
+    const [secId, idx] = tr.dataset.k.split(":");
+    const sec = SECTIONS.find(s => s.id === secId), it = sec.items[Number(idx)], st = state[tr.dataset.k] || {};
+    const qty = it.qty || 1;
+    const cb = tr.querySelector("input[type=checkbox]");
+    tr.className = cb.checked ? "done" : "";
+    if (sec.optional) { totalN++; if (cb.checked) { upN++; upSum += (st.price !== undefined ? st.price : it.price) * qty; } return; }
+    if (sec.range) {
+      offMin += (st.min !== undefined ? st.min : it.min) * qty;
+      offMax += (st.max !== undefined ? st.max : it.max) * qty;
+      totalN++; if (cb.checked) checkedN++;
+      return;
+    }
+    const p = (st.price !== undefined ? st.price : it.price) * qty;
+    wajib += p; totalN++;
+    if (cb.checked) { checkedSum += p; checkedN++; }
+  });
+  document.getElementById("progress").textContent =
+    checkedN + " dari " + totalN + " baris sudah dicentang · nilai yang sudah dicentang " + IDR(checkedSum);
+  const t = document.getElementById("totals");
+  t.innerHTML =
+    "<div><span>Komponen PCB wajib (otak + SMD + THT)</span><b>" + IDR(wajib) + "</b></div>" +
+    "<div><span>Off-PCB &amp; gagang DIY</span><b>" + IDR(offMin) + " – " + IDR(offMax) + "</b></div>" +
+    "<div><span>Upgrade opsional dicentang (" + upN + " item)</span><b>" + IDR(upSum) + "</b></div>" +
+    "<div class='big'><span>Total tanpa upgrade</span><span>" + IDR(wajib + offMin) + " – " + IDR(wajib + offMax) + "</span></div>" +
+    "<div class='big'><span>Total dengan upgrade</span><span>" + IDR(wajib + offMin + upSum) + " – " + IDR(wajib + offMax + upSum) + "</span></div>";
+}
+render();
+
+function copy(text, btn) {
+  const done = () => { const o = btn.textContent; btn.textContent = "Tersalin ✓"; setTimeout(() => btn.textContent = o, 1400); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => fallback(text, done));
+  else fallback(text, done);
+}
+function fallback(text, done) {
+  const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta);
+  ta.select(); try { document.execCommand("copy"); done(); } catch (e) { alert(text); } ta.remove();
+}
+document.getElementById("copyPending").addEventListener("click", e => {
+  const list = [];
+  document.querySelectorAll("tr[data-k]").forEach(tr => {
+    if (tr.querySelector("input[type=checkbox]").checked) return;
+    const [secId, idx] = tr.dataset.k.split(":");
+    const sec = SECTIONS.find(s => s.id === secId), it = sec.items[Number(idx)];
+    list.push("- " + it.name + "  [" + it.spec + "]");
+  });
+  copy(list.join("\n"), e.target);
+});
+document.getElementById("copyAll").addEventListener("click", e => {
+  const list = [];
+  SECTIONS.forEach(s => s.items.forEach(it => list.push(it.spec)));
+  copy(list.join("\n"), e.target);
+});
+document.getElementById("expandAll").addEventListener("click", e => {
+  const links = Array.from(document.querySelectorAll("a.lnk")).slice(0, 12);
+  links.forEach((a, i) => setTimeout(() => window.open(a.href, "_blank"), i * 400));
+  e.target.textContent = links.length + " link dibuka";
+  setTimeout(() => e.target.textContent = "Buka semua link Shopee", 2500);
+});
+document.getElementById("reset").addEventListener("click", () => { state = {}; save(); location.reload(); });
+</script>
+</body>
+</html>
