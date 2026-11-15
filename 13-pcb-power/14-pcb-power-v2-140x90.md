@@ -70,6 +70,29 @@ Selain DRC, aku jalankan pemeriksaan geometri sendiri dari file `.kicad_pcb`
 | Lebar jalur per net | V12/V24/VRAIL 2,5 mm · V36 2,0 mm · GND 2,5/1,5 mm · V5 1,0 mm · D2 0,6 mm |
 | Layer per net | F.Cu: V12, V24, VRAIL, V5, D2 · B.Cu: V36, GND |
 
+## Kapasitas arus jalur (IPC-2221, 1 oz = 35 um)
+
+| Jalur | Arus | Lebar | Batas @10 °C rise | Kenaikan suhu saat beban penuh |
+|---|---|---|---|---|
+| rail 12 V C210 (kartrid 2 ohm) | 6,0 A | 2,5 mm | 4,65 A | **~18 °C** |
+| rail 12 V C210 (kartrid 2,5 ohm) | 4,8 A | 2,5 mm | 4,65 A | ~11 °C |
+| rail 24 V T12 | 3,0 A | 2,5 mm | 4,65 A | ~3,7 °C |
+| distribusi 36 V | 2,2 A | 2,0 mm | 3,95 A | ~2,6 °C |
+| return GND | 6,0 A | 2,5 mm | 4,65 A | ~18 °C |
+| coil relay 5 V | 70 mA | 1,0 mm | 2,39 A | ~0 °C |
+| sinyal D2 | - | 0,6 mm | 1,65 A | ~0 °C |
+
+Artinya: **aman, tapi rail 12 V hangat (~18 °C di atas ambient, hanya saat pemanas
+menarik penuh; PID memotong duty jadi rata-ratanya lebih rendah)**. Dua cara
+memperbaiki kalau mau dingin:
+1. Order PCB **2 oz copper** -> batas jadi 7,68 A @10 °C (tambahan biaya kecil di JLCPCB).
+2. Atau pakai kartrid C210 >= 2,5 ohm (4,8 A) -> kenaikan hanya ~11 °C.
+
+Yang DRC tidak bisa jamin (cek di rakitan, bukan di file): panas modul step-down
+(~8 W masing-masing, butuh udara), kualitas crimp/sekrup kabel (pakai 18AWG untuk
+rail 6 A), usia kontak relay, sekring 3 A slow di sisi 36 V, dan enclosure tertutup
+untuk board PSU teladan.
+
 ## Cara pakai
 
 1. Order `c210-power-v2-gerber.zip` (2 layer, 1,6 mm, HASL). 140×90 mm, 5 pcs
