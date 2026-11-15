@@ -16,7 +16,7 @@ import os
 OUT = os.path.dirname(os.path.abspath(__file__))
 NAME = "c210-power-v2"
 
-NETS = [(0, ""), (1, "GND"), (2, "V36"), (3, "V12"), (4, "V24"), (5, "CTRL_D2"), (6, "V5"), (7, "VRAIL")]
+NETS = [(0, ""), (1, "GND"), (2, "V36"), (3, "V12"), (4, "V24"), (5, "CTRL_D2"), (6, "V5"), (7, "VRAIL"), (8, "VFAN")]
 NM = dict(NETS)
 
 def term(ref, x, y, nets, labels, pitch=5.08, drill=1.3, pad=2.9, label_dy=-4.2, ref_dy=4.2):
@@ -48,6 +48,8 @@ J8 = pads(60, 46, 4)             # NC / NO / COM / GND
 J6 = pads(96, 44, 3, 2.54)       # relay ctrl: D2 / 5V / GND
 J9 = pads(96, 58, 2)             # RAIL OUT
 J7 = pads(96, 84, 2); J11 = pads(110, 84, 2); J10 = pads(124, 84, 2)
+J12 = pads(32, 84, 2)            # FAN 12V (VFAN, GND)
+J13 = pads(50, 84, 2)            # THERMO (V12 -> VFAN; jumper kalau tanpa termostat)
 
 FPS = [term("J1", 15, 10, [2, 1], ["36V+", "GND"], label_dy=-5.6),
        term("J2", 15, 22, [2, 1], ["BUCK12 IN+", "GND"], label_dy=-5.6),
@@ -59,7 +61,9 @@ FPS = [term("J1", 15, 10, [2, 1], ["36V+", "GND"], label_dy=-5.6),
        term("J9", 96, 58, [7, 1], ["RAIL OUT", "GND"], label_dy=5.8, ref_dy=-4.6),
        term("J7", 96, 84, [3, 1], ["5V IN", "GND"], label_dy=-5.6),
        term("J11", 110, 84, [6, 1], ["5V OUT", "GND"], label_dy=-5.6),
-       term("J10", 124, 84, [5, 1], ["TO NANO", "GND"], label_dy=-5.6)]
+       term("J10", 124, 84, [5, 1], ["TO NANO", "GND"], label_dy=-5.6),
+       term("J12", 32, 84, [8, 1], ["FAN 12V+", "GND"], label_dy=-5.6),
+       term("J13", 50, 84, [3, 8], ["12V IN", "KE FAN"], label_dy=-5.6)]
 
 SEG = []
 def path(pts, net, w, layer):
@@ -83,7 +87,7 @@ path([(20.08, 87.5), (129.08, 87.5)], 1, 2.5, "B.Cu")           # trunk bawah
 
 # ---------- F.Cu: rail ----------
 # V12: J3 -> corridor x=9 -> cabang ke J8.1 (NC) & terus ke J7.1 (5V in)
-path([J3[0], (9, 34), (9, 87), (96, 87), J7[0]], 3, 2.5, "F.Cu")
+path([J3[0], (9, 34), (9, 88), (96, 88), J7[0]], 3, 2.5, "F.Cu")
 path([(9, 42), (60, 42), J8[0]], 3, 2.5, "F.Cu")
 # V24: J5 -> corridor x=12 -> lane y=50.5 -> J8.2 (NO)
 path([J5[0], (12, 58), (12, 50.5), (65.08, 50.5), J8[1]], 4, 2.5, "F.Cu")
@@ -93,6 +97,10 @@ path([J8[2], (71.5, 47.5), (71.5, 58), J9[0]], 7, 2.5, "F.Cu")
 path([J11[0], (112, 82), (112, 48), (98.54, 48), J6[1]], 6, 1.0, "F.Cu")
 # D2: J6.1 -> lane y=41.5 -> J10.1
 path([J6[0], (96, 41.5), (128, 41.5), (128, 80), (124, 80), J10[0]], 5, 0.6, "F.Cu")
+# FAN: V12 -> J13.1 (thermostat in) ; J13.2 -> J12.1 (fan +) ; J12.2 -> GND trunk
+path([(50, 88), J13[0]], 3, 1.0, "F.Cu")
+path([J13[1], (55.08, 81), (32, 81), J12[0]], 8, 1.0, "F.Cu")
+path([J12[1], (37.08, 87.5)], 1, 1.5, "B.Cu")
 
 # ---------- lubang M3 (grid zona modul + sudut) ----------
 HOLES = [(5, 5), (135, 5), (5, 85), (135, 85)]

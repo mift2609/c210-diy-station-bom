@@ -30,6 +30,8 @@ pasang spacer 5 mm, lalu sambung kabel pendek ke terminal. Tidak ada risiko
 | J7 | 5V IN (diambil dari rail 12 V) | kanan bawah (96,84) |
 | J11 | 5V OUT (ke coil relay J6) | kanan bawah (110,84) |
 | J10 | TO NANO: D2 / GND | kanan bawah (124,84) |
+| J12 | FAN 12V: VFAN / GND | bawah (32,84) |
+| J13 | THERMO: 12V / KE FAN (seri ke fan) | bawah (50,84) |
 
 Alur: `36V → J2/J4 → modul step-down → J3 (12V) & J5 (24V) → K1 NC/NO → K1 COM →
 J9 RAIL OUT → J1 (+) board C210`. Relay dipilih firmware (pin D2).
@@ -69,6 +71,24 @@ Selain DRC, aku jalankan pemeriksaan geometri sendiri dari file `.kicad_pcb`
 | Jarak minimum pad ke jalur net lain | 0,34 mm; berikutnya 0,80 mm |
 | Lebar jalur per net | V12/V24/VRAIL 2,5 mm · V36 2,0 mm · GND 2,5/1,5 mm · V5 1,0 mm · D2 0,6 mm |
 | Layer per net | F.Cu: V12, V24, VRAIL, V5, D2 · B.Cu: V36, GND |
+
+## Kipas (fan) di box
+
+Board sudah menyediakan koneksinya:
+
+- **J13 = jalur fan (V12 masuk, KE FAN keluar)** — di sinilah termostat dipasang seri.
+  Tanpa termostat: cukup jumper/short kedua pad J13 → fan nyala terus.
+- **J12 = konektor fan** (VFAN + GND). Fan 12 V 60 mm ≈ 0,06-0,15 A (1-1,8 W),
+  jalurnya 1 mm (batas ~2,4 A) — lega.
+- Rail 12 V dari buck **selalu hidup** selama PSU nyala (relay hanya memilih rail
+  mana yang masuk ke board C210), jadi fan ikut nyala saat PSU dinyalakan.
+- Termostat murah: bimetal 45 °C seri (Rp5-8 rb), atau modul NTC 12 V (Rp10-15 rb)
+  kalau mau setpoint yang bisa diatur. Fan yang lebih "hening": 12 V dijalankan lewat
+  resistor seri 22-47 ohm (turun kecepatan, tapi pendinginan berkurang).
+
+Pemasangan di box: intake bawah + exhaust atas, arah udara melewati modul step-down
+(bukan ke sisi 220 V), kasih filter mesh di intake supaya flux/debu tidak menempel
+di bilah fan, dan jauhkan fan dari terminal 220 V board PSU.
 
 ## Kapasitas arus jalur (IPC-2221, 1 oz = 35 um)
 
