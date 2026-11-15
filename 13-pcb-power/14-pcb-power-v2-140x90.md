@@ -56,6 +56,20 @@ export gerber + drill -> 9 file di c210-power-v2-gerber.zip
 DRC v2 sempat menemukan 49 violation di iterasi pertama (GND nyerempet lubang grid,
 jalur 36 V nyilang jalur 12 V, stub GND lewat pad net lain) — sudah diperbaiki di layout.
 
+## Pemeriksaan tambahan (permintaan "lihat PCB-nya")
+
+Selain DRC, aku jalankan pemeriksaan geometri sendiri dari file `.kicad_pcb`
+(pad + segmen, toleransi lebar jalur):
+
+| Uji | Hasil |
+|---|---|
+| Semua pad tersambung ke copper | ya — 25 pad, **0 pad tanpa copper** |
+| Net terpecah (pad tidak nyambung ke grup net-nya) | **tidak ada** |
+| Jarak tepi-ke-tepi minimum antar net berbeda (layer sama) | **0,34 mm** (pad V5 J6.2 ke GND trunk) — di atas rule 0,2 mm |
+| Jarak minimum pad ke jalur net lain | 0,34 mm; berikutnya 0,80 mm |
+| Lebar jalur per net | V12/V24/VRAIL 2,5 mm · V36 2,0 mm · GND 2,5/1,5 mm · V5 1,0 mm · D2 0,6 mm |
+| Layer per net | F.Cu: V12, V24, VRAIL, V5, D2 · B.Cu: V36, GND |
+
 ## Cara pakai
 
 1. Order `c210-power-v2-gerber.zip` (2 layer, 1,6 mm, HASL). 140×90 mm, 5 pcs

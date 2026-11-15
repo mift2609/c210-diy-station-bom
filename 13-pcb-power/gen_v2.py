@@ -90,17 +90,17 @@ path([J5[0], (12, 58), (12, 50.5), (65.08, 50.5), J8[1]], 4, 2.5, "F.Cu")
 # VRAIL: J8.3 (COM) -> corridor x=71.5 -> J9B.1 (RAIL OUT)
 path([J8[2], (71.5, 47.5), (71.5, 58), J9[0]], 7, 2.5, "F.Cu")
 # V5: J11.1 (5V OUT) -> J6.2 (coil relay)
-path([J11[0], (110, 48), (98.54, 48), J6[1]], 6, 1.0, "F.Cu")
+path([J11[0], (112, 82), (112, 48), (98.54, 48), J6[1]], 6, 1.0, "F.Cu")
 # D2: J6.1 -> lane y=41.5 -> J10.1
-path([J6[0], (96, 41.5), (124, 41.5), J10[0]], 5, 0.6, "F.Cu")
+path([J6[0], (96, 41.5), (128, 41.5), (128, 80), (124, 80), J10[0]], 5, 0.6, "F.Cu")
 
 # ---------- lubang M3 (grid zona modul + sudut) ----------
 HOLES = [(5, 5), (135, 5), (5, 85), (135, 85)]
 for gx in (32, 50, 68, 86):
     for gy in (10, 38, 54, 76):
         HOLES.append((gx, gy))
-for gx in (98, 116, 134):
-    for gy in (10, 38, 54, 76):
+for gx in (108, 124, 134):
+    for gy in (12, 36, 58, 74):
         HOLES.append((gx, gy))
 MECH = [hole(x, y) for (x, y) in HOLES]
 
@@ -108,7 +108,7 @@ GR = ['  (gr_rect (start 0 0) (end 140 90) (stroke (width 0.1) (type default)) (
 def txt(s, x, y, size=1.0, layer="F.SilkS", bold=False):
     GR.append(f'  (gr_text "{s}" (at {x} {y}) (layer "{layer}") (effects (font (size {size} {size})'
               + (" bold" if bold else "") + ')))')
-txt("C210 POWER BOARD v2  -  dual rail (C210 12V / T12 24V)", 32, 4.2, 1.3, bold=True)
+txt("C210 POWER BOARD v2 - dual rail (C210 12V / T12 24V)", 82, 5.0, 1.2, bold=True)
 txt("zona modul: grid M3 3,2mm - pakai spacer 5mm", 32, 87.0, 0.9)
 txt("36V -> J2/J4 -> modul -> J3/J5 -> K1 NC/NO -> COM -> J9B RAIL OUT", 90, 6.5, 0.8, layer="F.Fab")
 txt("GND: trunk kiri/bawah + V36 distribusi di B.Cu", 88, 86.5, 0.8, layer="F.Fab")
