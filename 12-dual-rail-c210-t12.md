@@ -98,6 +98,30 @@ kenaikan suhu — C210 di 24 V naik kira-kira 4× lebih cepat daripada T12 di 24
 | Sekring ikut R kartrid | C210 ~2 Ω → 8 A; T12 ~8 Ω → 3 A fast |
 | ID gagang di dalam gagang (pin 5 = SP, jalur sudah ada di PCB) | autodetect; verifikasi kontinuitas SP ↔ D10 |
 
+## Relay: modul di LUAR PCB (bukan di board)
+
+PCB tidak diedit. Relay = **modul relay 5 V 1 channel** yang dipasang di dalam
+enclosure, disambung kabel:
+
+```unknown
+buck 12V (+) --[NC]                    [COM]-- J1 (+) board
+buck 24V (+) --[NO]   modul relay SPDT (SRD-05VDC)
+D2 (socket Nano) --[IN]     VCC-> 5V buck    GND-> GND common
+```
+
+- Modul relay sudah berisi transistor + dioda flyback + optocoupler, jadi tidak
+  perlu rangkaian tambahan. Yang di-PCB cuma tidak ada footprint-nya.
+- Jumper trigger modul (kalau ada) set ke **HIGH trigger** → pin HIGH = coil nyala
+  = rail 24 V, cocok dengan `RAIL_SEL_24V_LEVEL = HIGH`. Kalau modulmu cuma
+  low-trigger, ubah define itu jadi `LOW` dan ulangi compile.
+- Kontak relay hanya berganti saat pemanas OFF (arus 0) → tidak ada busur.
+- Kabel: 20AWG minimal, terminal sekrup, jalur sependek mungkin.
+- Coil ambil 5 V dari buck 5 V, bukan dari 78M05 (di rail 24 V 78M05 sudah panas).
+
+Alternatif tanpa relay: **saklar SPDT manual ≥6 A DC** (Rp10-20 rb) yang memilih
+buck 12 V atau buck 24 V. Otomatisnya hilang, tapi FLT3 tetap jadi penjaga: profil
+C210 (rail 12 V) yang diberi 24 V langsung mengunci pemanas.
+
 ## Urutan uji (jangan dilompati)
 
 1. Pasang relay + 2 buck, **belum** pasang gagang. Ukur: NC = 12 V, NO = 24 V di J1.

@@ -114,7 +114,7 @@ const SECTIONS = [
   ]},
   { id: "upgrade", title: "Upgrade opsional (urutan prioritas)", optional: true, items: [
     { name: "Kabel earth tip → chassis → PE", spec: "kabel silikon 22awg", qty: 1, price: 5000, note: "WAJIB kalau dipakai untuk board HP" },
-    { name: "Relay SPDT 5V pemilih rail 12V/24V", spec: "modul relay 5v 1 channel", qty: 1, price: 20000, note: "WAJIB dual-rail: NC = buck 12V, NO = buck 24V, kontrol D2 (flywire)" },
+    { name: "Modul relay SPDT 5V (di luar PCB, dalam box)", spec: "modul relay 5v 1 channel high level trigger", qty: 1, price: 20000, note: "WAJIB dual-rail: NC = buck 12V, NO = buck 24V, COM = J1+, IN dari D2. PCB tidak diedit" },
     { name: "Buck 24V ≥4A (rail T12)", spec: "step down 8-60v 15a 200w", qty: 1, price: 75000, note: "PSU 36V terukur → modul input ≥50V (mis. 8-60V 15A). XL4015/XL4016 40V JANGAN" },
     { name: "Buck 12V ≥8A (rail C210)", spec: "step down 8-60v 15a 200w", qty: 1, price: 75000, note: "PSU 36V terukur → modul input ≥50V" },
     { name: "MOSFET ≥40V pengganti IRLR7843", spec: "mosfet n-channel to-252 40v logic level", qty: 1, price: 15000, note: "WAJIB kalau rail 24V dipakai (IRLR7843 cuma 30V Vds)" },
