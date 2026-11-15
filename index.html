@@ -116,7 +116,7 @@ const SECTIONS = [
     { name: "Kabel earth tip → chassis → PE", spec: "kabel silikon 22awg", qty: 1, price: 5000, note: "WAJIB kalau dipakai untuk board HP" },
     { name: "Modul relay SPDT 5V (di luar PCB, dalam box)", spec: "modul relay 5v 1 channel high level trigger", qty: 1, price: 20000, note: "WAJIB dual-rail: NC = buck 12V, NO = buck 24V, COM = J1+, IN dari D2. PCB tidak diedit" },
     { name: "Buck 24V ≥4A (rail T12)", spec: "xl4015 5a cc cv step down", qty: 1, price: 20000, note: "XL4015 cukup (T12 3A), TAPI input 36V tepat di batas IC → idealnya PSU ditrim ≤30V" },
-    { name: "Buck 12V (rail C210)", spec: "xl4015 5a cc cv step down", qty: 1, price: 20000, note: "C210 2Ω = 6A → XL4015 (5A) kurang. Alternatif: SZBK07 (6-40V, 20A CC/CV) atau modul 6A input 5,5-60V. Lihat tabel di 12-dual-rail-c210-t12.md" },
+    { name: "Buck 12V (rail C210)", spec: "xl4016 8a step down (XH-M404)", qty: 1, price: 29500, note: "C210 2Ω = 6A → XL4015 (5A) kurang. Alternatif: SZBK07 (6-40V, 20A CC/CV) atau modul 6A input 5,5-60V. Lihat tabel di 12-dual-rail-c210-t12.md" },
     { name: "MOSFET ≥40V pengganti IRLR7843", spec: "mosfet n-channel to-252 40v logic level", qty: 1, price: 15000, note: "WAJIB kalau rail 24V dipakai (IRLR7843 cuma 30V Vds)" },
     { name: "ID gagang: pin 5 = SP (sudah ada di PCB)", spec: "tidak perlu beli — verifikasi kontinuitas J3 pin 5 ↔ D10", qty: 1, price: 0, note: "T12: pin 5 ke GND di dalam gagang. Kalau SP ternyata bukan D10, 1 flywire dari socket Nano" },
     { name: "PCB POWER BOARD v1 (gerber baru, 90×60mm)", spec: "jasa cetak pcb 2 layer 90x60 — gerber dari 13-pcb-power/", qty: 1, price: 50000, note: "relay + slot step-down di luar board utama; 0 error DRC. Lihat 13-pcb-power-board.md" },

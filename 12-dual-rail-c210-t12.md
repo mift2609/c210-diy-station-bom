@@ -155,6 +155,20 @@ tidak ada perubahan PCB). Cek ukuran fisik modul sebelum memesan — SZBK07 seki
 65x47 mm, jadi dua modul SZBK07 **tidak muat** di board 90x60 (taruh di samping board
 di dalam box).
 
+Temuan harga (Shopee ID/MY, cek ulang saat checkout):
+
+| Modul | Input | Arus | Harga | Verdict |
+|---|---|---|---|---|
+| XL4015 5A | 8-36 V (abs 40) | 5 A | ~Rp15-25 rb | termurah; cukup rail 24 V, kurang rail 12 V |
+| **XL4016 8A** | 5-40 V | 8 A | **~Rp29,5 rb** | termurah yang masih cukup untuk rail 12 V (C210 6 A) |
+| 6A sync 5,5-60 V | 5,5-60 V | 6 A | ~Rp25-35 rb | margin input lega, arus pas-pasan |
+| SZBK07 20A CC/CV | 6-40 V | 20 A | ~Rp50-90 rb | paling aman, paling mahal |
+| Konverter 12 V fixed 10 A | 8-40 V / 60-72 V | 10 A | ~Rp40-70 rb | tidak bisa diatur |
+
+**Kombinasi termurah yang tetap benar: XL4016 (rail 12 V) + XL4015 (rail 24 V)
+- total ± Rp45-55 rb.** Kalau kartrid C210-mu 2,5-3 ohm (4,0-4,8 A), dua XL4015
+saja cukup -> ± Rp30-40 rb, itu paling murah.
+
 | Modul | Input | Output / arus | Catatan | Rail |
 |---|---|---|---|---|
 | **SZBK07** (CC/CV, 300W) | 6-40 V | 1,2-36 V, 20 A | headroom besar, bisa set limit arus; input 36 V margin 4 V | 12 V **dan** 24 V |
