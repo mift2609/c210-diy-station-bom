@@ -119,7 +119,7 @@ const SECTIONS = [
     { name: "Buck 12V (rail C210)", spec: "xl4016 8a step down (XH-M404)", qty: 1, price: 29500, note: "C210 2Ω = 6A → XL4015 (5A) kurang. Alternatif: SZBK07 (6-40V, 20A CC/CV) atau modul 6A input 5,5-60V. Lihat tabel di 12-dual-rail-c210-t12.md" },
     { name: "MOSFET ≥40V pengganti IRLR7843", spec: "mosfet n-channel to-252 40v logic level", qty: 1, price: 15000, note: "WAJIB kalau rail 24V dipakai (IRLR7843 cuma 30V Vds)" },
     { name: "ID gagang: pin 5 = SP (sudah ada di PCB)", spec: "tidak perlu beli — verifikasi kontinuitas J3 pin 5 ↔ D10", qty: 1, price: 0, note: "T12: pin 5 ke GND di dalam gagang. Kalau SP ternyata bukan D10, 1 flywire dari socket Nano" },
-    { name: "PCB POWER BOARD v1 (gerber baru, 90×60mm)", spec: "jasa cetak pcb 2 layer 90x60 — gerber dari 13-pcb-power/", qty: 1, price: 50000, note: "relay + slot step-down di luar board utama; 0 error DRC. Lihat 13-pcb-power-board.md" },
+    { name: "PCB POWER BOARD v2 (140×90mm, zona modul)", spec: "jasa cetak pcb 2 layer 140x90 — gerber dari 13-pcb-power/", qty: 1, price: 80000, note: "relay + 2 modul step-down + modul 5V duduk di PCB (grid lubang M3); 0 error DRC. Lihat 14-pcb-power-v2-140x90.md" },
     { name: "OPA2387 ganti LMV358", spec: "OPA2387 SOIC-8", qty: 1, price: 50000, note: "zero-drift, GBW 5,7MHz; kalibrasi ulang" },
     { name: "Buck 5V ganti 78M05", spec: "modul MP1584 step down", qty: 1, price: 12000, note: "WAJIB kalau rail 24V dipakai (78M05 buang ~2,3W); sekaligus suplai coil relay" },
     { name: "Snubber + TVS output heater", spec: "TVS diode SMA", qty: 1, price: 5000, note: "opsional di 12V, wajib kalau pindah 24V" },
