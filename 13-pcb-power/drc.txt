@@ -1,0 +1,64 @@
+** Drc report for c210-power-v1.kicad_pcb **
+** Created on 2026-11-15T13:53:56 **
+** Report includes: Errors, Warnings **
+
+** Found 15 DRC violations **
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(8.0000 mm, 10.0000 mm): Footprint J1
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(8.0000 mm, 20.0000 mm): Footprint J2
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(8.0000 mm, 30.0000 mm): Footprint J3
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(52.0000 mm, 10.0000 mm): Footprint J4
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(52.0000 mm, 20.0000 mm): Footprint J5
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(78.0000 mm, 26.0000 mm): Footprint J6
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(80.5400 mm, 34.0000 mm): Footprint J7
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(30.0000 mm, 42.0000 mm): Footprint J8
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(8.0000 mm, 52.0000 mm): Footprint J9
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(52.0000 mm, 52.0000 mm): Footprint J10
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(5.0000 mm, 5.0000 mm): Footprint H
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(85.0000 mm, 5.0000 mm): Footprint H
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(5.0000 mm, 55.0000 mm): Footprint H
+[lib_footprint_issues]: The current configuration does not include the footprint library 'c210'
+    Local override; warning
+    @(85.0000 mm, 55.0000 mm): Footprint H
+[silk_edge_clearance]: Silkscreen clipped by board edge
+    Rule: board setup constraints silk; warning
+    @(0.0000 mm, 0.0000 mm): Rectangle on Edge.Cuts
+    @(6.0000 mm, 59.4000 mm): PCB text '36V -> BUCK12 -> K1 NC | 36V -> BUCK24 -> K1 NO | K1 COM -> J9 RAIL OUT' on F.Silkscreen
+
+** Found 0 unconnected pads **
+
+** Found 0 Footprint errors **
+
+** Ignored checks **
+    - Footprint has no courtyard defined
+    - Track endpoint not centered on via
+    - Tuning profile track geometries
+    - Footprint doesn't match symbol's footprint filters
+    - Footprint component type doesn't match footprint pads
+
+** End of Report **
