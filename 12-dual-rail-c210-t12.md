@@ -148,6 +148,30 @@ Aturan:
 5. Board power (13-pcb-power) TIDAK perlu diubah: slot-nya terminal block, modul apa
    pun bisa dipasang.
 
+## Alternatif modul step-down (selain XL4015)
+
+Semua modul di bawah ini cocok dengan board power `13-pcb-power` (slot-nya terminal,
+tidak ada perubahan PCB). Cek ukuran fisik modul sebelum memesan — SZBK07 sekitar
+65x47 mm, jadi dua modul SZBK07 **tidak muat** di board 90x60 (taruh di samping board
+di dalam box).
+
+| Modul | Input | Output / arus | Catatan | Rail |
+|---|---|---|---|---|
+| **SZBK07** (CC/CV, 300W) | 6-40 V | 1,2-36 V, 20 A | headroom besar, bisa set limit arus; input 36 V margin 4 V | 12 V **dan** 24 V |
+| **6A synchronous 5,5-60 V** | 5,5-60 V | 3,3-24 V, 6 A | margin input paling lega, kecil (~45x25 mm) | 12 V (pas) / 24 V (lega) |
+| **10-90 V → 6 A (100W)** | 10-90 V | 1,5-60 V, 6 A | margin input terbesar, murah | 12 V / 24 V |
+| **XL4016 (8 A)** | 5-40 V | 1,25-36 V, 8 A | keluarga XL4015, arus lebih besar; input 36 V tetap mepet | 12 V (lebih baik dari XL4015) |
+| **Konverter 12 V fixed 10 A** (tipe mobil) | 8-40 V (ada 60-72 V) | 12 V, 10 A | tidak bisa diatur, tapi kokoh; ambil versi input >=60 V | 12 V |
+
+Aturan pilih: **input rating >= 45 V** kalau bisa (rail PSU 36 V + spike), dan **arus
+>= 1,5x beban kerja**. Untuk C210 2 ohm di 12 V (6 A) -> minimal modul 8-10 A, atau
+modul CC/CV yang dibatasi ~6-7 A.
+
+Kalau nanti mau rangkaian buck-nya diskret di PCB (bukan modul): pakai IC kelas 60 V —
+TPS54560 (input 4,5-60 V, 5 A) untuk rail 24 V; untuk rail 12 V 6 A pakai controller
+60-80 V + MOSFET eksternal (mis. LM5085 / LM5145). Itu desain baru + hitungan induktor
+sendiri, bukan tempel modul.
+
 ## Urutan uji (jangan dilompati)
 
 1. Pasang relay + 2 buck, **belum** pasang gagang. Ukur: NC = 12 V, NO = 24 V di J1.
