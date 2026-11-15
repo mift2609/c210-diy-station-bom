@@ -115,8 +115,8 @@ const SECTIONS = [
   { id: "upgrade", title: "Upgrade opsional (urutan prioritas)", optional: true, items: [
     { name: "Kabel earth tip → chassis → PE", spec: "kabel silikon 22awg", qty: 1, price: 5000, note: "WAJIB kalau dipakai untuk board HP" },
     { name: "Relay SPDT 5V pemilih rail 12V/24V", spec: "modul relay 5v 1 channel", qty: 1, price: 20000, note: "WAJIB dual-rail: NC = buck 12V, NO = buck 24V, kontrol D2 (flywire)" },
-    { name: "Buck 24V ≥4A (rail T12)", spec: "step down 24v 5a module", qty: 1, price: 40000, note: "input rating ≥45V (PSU 32-36V; modul 40V terlalu mepet)" },
-    { name: "Buck 12V ≥8A (rail C210)", spec: "step down 12v 8a module", qty: 1, price: 50000, note: "input rating ≥45V" },
+    { name: "Buck 24V ≥4A (rail T12)", spec: "step down 8-60v 15a 200w", qty: 1, price: 75000, note: "PSU 36V terukur → modul input ≥50V (mis. 8-60V 15A). XL4015/XL4016 40V JANGAN" },
+    { name: "Buck 12V ≥8A (rail C210)", spec: "step down 8-60v 15a 200w", qty: 1, price: 75000, note: "PSU 36V terukur → modul input ≥50V" },
     { name: "MOSFET ≥40V pengganti IRLR7843", spec: "mosfet n-channel to-252 40v logic level", qty: 1, price: 15000, note: "WAJIB kalau rail 24V dipakai (IRLR7843 cuma 30V Vds)" },
     { name: "Kabel ID gagang (D10 → pin 5 GX12)", spec: "kabel silikon 22awg", qty: 1, price: 2000, note: "gagang T12: pin 5 ke GND di DALAM gagang" },
     { name: "OPA2387 ganti LMV358", spec: "OPA2387 SOIC-8", qty: 1, price: 50000, note: "zero-drift, GBW 5,7MHz; kalibrasi ulang" },

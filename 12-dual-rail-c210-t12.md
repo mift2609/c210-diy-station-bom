@@ -6,7 +6,7 @@ Status: firmware selesai & terverifikasi; hardware (relay + 2 buck) belum dipasa
 ## Rencana yang dipakai
 
 ```unknown
-PSU 32-36V (WX-DC2416 yang sudah ada)
+PSU 36V 5A (WX-DC2416 yang sudah ada — output terukur 36 V)
    ├─ buck A → 24V  (rail T12)
    └─ buck B → 12V  (rail C210)
         │
@@ -82,7 +82,7 @@ kenaikan suhu — C210 di 24 V naik kira-kira 4× lebih cepat daripada T12 di 24
 | MOSFET ≥40 V (ganti IRLR7843 30 V) | spike induktif kabel gagang di 24 V bisa menjebol Vds 30 V |
 | 5V dari buck (MP1584 / MP2315) | 78M05 di 24 V buang ~2,3 W; sekaligus suplai coil relay |
 | Relay SPDT 5V, kontak ≥6 A DC | pemilih rail 12/24 V |
-| Buck 24V ≥4 A dan buck 12V ≥8 A | input rating ≥45 V (rail PSU 32-36 V; modul 40 V terlalu mepet) |
+| Buck 24V ≥4 A dan buck 12V ≥8 A | PSU 36 V → modul **input ≥50 V** (mis. tipe 8-60V → 1-36V 15A 200W). XL4015/XL4016 mentok 36-40 V (datasheet XL4016: 5-40 V): **JANGAN** |
 | Sekring ikut R kartrid | C210 ~2 Ω → 8 A; T12 ~8 Ω → 3 A fast |
 | Kabel ID (D10 → pin 5) | autodetect |
 
@@ -105,10 +105,24 @@ kenaikan suhu — C210 di 24 V naik kira-kira 4× lebih cepat daripada T12 di 24
 | Item | Estimasi |
 |---|---|
 | Modul relay 1 channel 5V | Rp15.000 – 25.000 |
-| Buck 24V ≥4A (input ≥45V) | Rp30.000 – 60.000 |
-| Buck 12V ≥8A (input ≥45V) | Rp40.000 – 80.000 |
+| Buck 24V ≥4A (input ≥50V, mis. 8-60V 15A) | Rp60.000 – 100.000 |
+| Buck 12V ≥8A (input ≥50V, mis. 8-60V 15A) | Rp60.000 – 100.000 |
 | Buck 5V (MP1584/MP2315) | Rp10.000 – 15.000 |
 | MOSFET ≥40V TO-252 | Rp10.000 – 20.000 |
 | Kabel ID + flywire D2 | ~Rp0 (sisa kabel) |
 
-Total tambahan ± Rp105.000 – Rp200.000 di atas rencana 12V-only.
+Total tambahan ± Rp95.000 – Rp260.000 di atas rencana 12V-only.
+
+## Catatan PSU 36 V (terkonfirmasi)
+
+PSU-mu **36 V 5 A = 180 W**. Beban maksimum hanya satu rail pada satu waktu
+(24 V × 3 A = 72 W untuk T12, atau 12 V × 6 A = 72 W untuk C210) → headroom besar,
+tidak perlu ganti PSU.
+
+Yang berubah karena 36 V (bukan 32 V):
+- Buck **wajib** rating input ≥50 V. XL4015/XL4016 punya batas 40 V (XL4016 datasheet:
+  input 5-40 V) — dengan 36 V masuk, ringing + spike saat switching tidak punya margin.
+- Disipasi di buck tetap kecil (switching, bukan linear): 36→24 V @3 A ≈ 8 W panas,
+  36→12 V @6 A ≈ 8 W panas → modul perlu heatsink, kasih udara.
+- Set output **diukur pakai multimeter sebelum tersambung ke board** (rail 24 V
+  ke profil C210 = kartrid rusak).

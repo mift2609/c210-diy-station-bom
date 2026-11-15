@@ -56,6 +56,7 @@ KARTU WAJIB SEBELUM FLASH (hardware):
   - MOSFET pengganti IRLR7843 (30 V) -> tipe >= 40 V (rail 24V menambah spike).
   - 5V dari buck, BUKAN 78M05 (di rail 24V 78M05 buang ~2,3 W) + suplai coil relay.
   - Relay SPDT modul 5V, kontak >= 6 A DC.
+  - Buck input rating >= 50 V (PSU 36 V terukur; XL4015/XL4016 batas 40 V -> JANGAN).
 
 ------------------------------------------------------------------------
 CARA FLASH

@@ -27,7 +27,7 @@ Satu board, satu colokan, gantian gagang:
   autodetect gagang lewat ID pin (D10), 2 slot tip, firmware `firmware-gantian/`
   (v1.3-C210g, 24.412 byte).
 - **T12 (24 V)** — lihat [`12-dual-rail-c210-t12.md`](12-dual-rail-c210-t12.md):
-  PSU 32-36 V -> buck 24 V (T12) + buck 12 V (C210), dipilih **relay SPDT** yang
+  PSU 36 V (terukur) -> buck 24 V (T12) + buck 12 V (C210) (buck input >= 50 V), dipilih **relay SPDT** yang
   dikendalikan D2; rail ikut profil tip otomatis. Firmware `firmware-dualrail/`
   (v1.3-dual, 24.570 byte). Wajib untuk rail 24 V: MOSFET >= 40 V, 5 V dari buck,
   sekring ikut R kartrid.
