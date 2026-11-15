@@ -1,0 +1,87 @@
+FIRMWARE C210 — VARIAN DUAL-RAIL (C210 12V <-> T12 24V, satu colokan)
+=====================================================================
+Folder : 11-firmware-dualrail/
+Isi    : SolderingStation2_C210_dualrail.hex      <- siap flash
+         SolderingStation2_C210_dualrail/         <- source (sketch folder)
+Basis  : 10-firmware-gantian (autodetect gagang) + 08 (fail-safe FLT1/2/3).
+         Varian 02 (asli), 08 (fail-safe), 10 (gantian gagang 12V) tetap utuh.
+
+Baca dulu 12-dual-rail-c210-t12.md (arsitektur, wiring, urutan uji) sebelum flash.
+
+------------------------------------------------------------------------
+APA YANG DITAMBAHKAN DI ATAS VARIAN 10
+------------------------------------------------------------------------
+  1. Rail pemanas ikut profil tip aktif:
+        slot 0 "C210" -> rail 12V (buck 12V)
+        slot 1 "T12"  -> rail 24V (buck 24V)
+     Pemilih rail: relay SPDT di jalur feed board (NC = buck 12V, NO = buck 24V),
+     dikendalikan RAIL_SEL_PIN (D2, flywire dari socket Nano).
+     Slot tip tetap dipilih otomatis dari ID gagang (D10): T12 = pin 5 ke GND.
+
+  2. Urutan ganti rail yang aman (setRailForced()):
+        heater OFF (analogWrite 255) -> jeda 300 ms -> relay klik -> jeda 300 ms
+        -> PID mulai dari nol (Output = 255). Relay TIDAK pernah ganti saat
+        pemanas sedang mengalirkan arus.
+
+  3. Ambang FLT3 jadi ikut rail: 15,5 V di rail 12V, 30 V di rail 24V (mV di
+     firmware). Karena VIN_PIN mengukur rail yang masuk ke board, ini sekaligus
+     jadi pemeriksa: kalau profil C210 (rail 12V) tapi yang masuk 24V -> FLT3
+     langsung mengunci pemanas.
+
+  4. Default aman saat boot: pin relay ditulis LOW (= rail 12V, relay mati)
+     sebelum apa pun, lalu di-set ulang sesuai profil hasil autodetect.
+
+  Yang TIDAK diubah: kurva kalibrasi, PID, timer sleep, menu, EEPROM layout.
+  Fail-safe FLT1/FLT2 tetap seperti varian 08/10.
+
+  CATATAN JUJUR: firmware TIDAK bisa mengukur resistansi kartrid. Jadi kalau
+  kabel ID gagang salah (C210 dilaporkan sebagai T12), firmware akan
+  memberi 24 V ke kartrid C210 -> kartrid rusak. Pelindung sebenarnya = wiring
+  ID yang benar (di dalam gagang, bukan di soket) + satu soket + label gagang.
+  Rencana lanjutan kalau perlu: cek laju kenaikan suhu (C210 di 24 V naik ~4x
+  lebih cepat) — belum diterapkan karena ambangnya harus diukur di bangku.
+
+------------------------------------------------------------------------
+ANGKA HASIL KOMPILASI (arduino-cli, arduino:avr:nano:cpu=atmega328old)
+------------------------------------------------------------------------
+  Asli           : 23.614 byte (76%), RAM 1.065 (52%)
+  Fail-safe 08   : 24.260 byte (78%), RAM 1.074 (52%)
+  Gantian 10     : 24.412 byte (79%), RAM 1.075 (52%)
+  Dual-rail 11   : 24.570 byte (79%), RAM 1.078 (52%)
+  -> +158 byte dari varian 10, sisa ~6,1 KB. Hex 1.537 record, 0 checksum
+     rusak, alamat 0x0000..0x5FF9 (bootloader > 0x7600 tidak tersentuh).
+  VERSION di menu Information: "v1.3-dual"
+
+KARTU WAJIB SEBELUM FLASH (hardware):
+  - MOSFET pengganti IRLR7843 (30 V) -> tipe >= 40 V (rail 24V menambah spike).
+  - 5V dari buck, BUKAN 78M05 (di rail 24V 78M05 buang ~2,3 W) + suplai coil relay.
+  - Relay SPDT modul 5V, kontak >= 6 A DC.
+
+------------------------------------------------------------------------
+CARA FLASH
+------------------------------------------------------------------------
+  LEPAS jumper J2 di PCB dulu, pasang lagi setelah upload.
+
+  arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:nano:cpu=atmega328old \
+      ~/Downloads/C210/11-firmware-dualrail/SolderingStation2_C210_dualrail
+
+  atau hex langsung:
+  avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b 57600 \
+     -U flash:w:$HOME/Downloads/C210/11-firmware-dualrail/SolderingStation2_C210_dualrail.hex:i
+
+------------------------------------------------------------------------
+UJI WAJIB SESUDAH FLASH
+------------------------------------------------------------------------
+  1. Menu Information -> Firmware: v1.3-dual.
+  2. Gagang C210 tercolok (ID terbuka): menu Tip -> "C210"; ukur tegangan di
+     terminal J1 board = ~12 V. Gagang T12 (pin 5 ke GND): harus "T12" + J1 ~24 V.
+  3. Ganti gagang saat station hidup: relay harus klik, tampil slot baru + beep,
+     dan pemanas OFF selama proses ganti (display suhu turun).
+  4. FLT3 rail: paksa rail 12V tapi beri 24V (atau sebaliknya) -> harus "FLT3".
+  5. FLT2: tarik kartrid saat heater ON -> heater mati + beep 2x + "FLT2".
+  6. Kalibrasi per slot (Calibrate Tip 200/280/360 C) untuk C210 DAN T12.
+
+------------------------------------------------------------------------
+ROLLBACK
+------------------------------------------------------------------------
+  10-firmware-gantian (dua gagang 12V)  atau  08-firmware-safefix (1 slot tip).

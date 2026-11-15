@@ -1,0 +1,83 @@
+FIRMWARE C210 — VARIAN GANTIAN GAGANG (C210 <-> T210)
+=====================================================
+Folder : 10-firmware-gantian/
+Isi    : SolderingStation2_C210_gantian.hex      <- siap flash
+         SolderingStation2_C210_gantian/         <- source (sketch folder)
+Basis  : 08-firmware-safefix (fail-safe FLT1/FLT2/FLT3) yang TIDAK diubah.
+         Folder 02 (asli) dan 08 (fail-safe) tetap utuh sebagai pembanding/rollback.
+
+------------------------------------------------------------------------
+APA YANG DITAMBAHKAN DI ATAS VARIAN FAIL-SAFE
+------------------------------------------------------------------------
+  1. Dua slot tip default: "C210" (slot 0) dan "T210" (slot 1).
+     NumberOfTips = 2. Slot 1 kalibrasi defaultnya IKUT TERISI (bukan nol),
+     supaya gagang kedua tidak dibaca dengan kurva rusak sebelum dikalibrasi.
+
+  2. Autodetect gagang lewat pin D10 (pin sisa di board ini, SWITCH_PIN
+     sudah dipindah ke D3):
+        D10 HIGH (terbuka)  -> slot 0 (nama "C210")
+        D10 LOW  (ke GND)   -> slot 1 (nama "T210")
+     Wiring: kabel dari socket Nano D10 -> pin 5 soket gagang (GX12).
+     Di gagang T210, pin 5 disambung ke GND/badan gagang.
+     Pembacaan: majority vote 5 sampel; dicek ulang berkala saat station hidup
+     (~250 siklus baca) -> colok gagang lain, display pindah slot otomatis + beep.
+
+  3. Menu tetap sama: Tip Settings -> Change Tip / Calibrate Tip / Rename Tip.
+     Mau pilih manual tanpa kabel ID? tetap bisa (Change Tip).
+
+  4. getEEPROM() diklem: NumberOfTips dijaga 1..TIPMAX dan CurrentTip selalu
+     < NumberOfTips. Sebelumnya isi EEPROM yang aneh/rusak bisa membuat indeks
+     keluar dari array (CalTemp/TipName) -> pembacaan suhu ngawur.
+
+  Yang TIDAK diubah: kurva kalibrasi, konstanta PID (agg/cons), timer sleep,
+  menu, penyimpanan EEPROM. Fail-safe FLT1/FLT2/FLT3 tetap aktif.
+
+------------------------------------------------------------------------
+ANGKA HASIL KOMPILASI (arduino-cli, arduino:avr:nano:cpu=atmega328old)
+------------------------------------------------------------------------
+  Asli        : 23.614 byte flash (76%), RAM 1.065 byte (52%)
+  Fail-safe 08: 24.260 byte flash (78%), RAM 1.074 byte (52%)
+  Gantian  10 : 24.412 byte flash (79%), RAM 1.075 byte (52%)
+  -> +152 byte dari varian 08, sisa ~6,3 KB. Hex 1.528 record, 0 checksum
+     rusak, alamat 0x0000..0x5F5B (bootloader > 0x7600 tidak tersentuh).
+  VERSION di menu Information: "v1.3-C210g"
+
+------------------------------------------------------------------------
+CARA FLASH
+------------------------------------------------------------------------
+  LEPAS dulu jumper J2 di PCB, pasang lagi setelah upload selesai.
+
+  Pakai arduino-cli:
+     arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:nano:cpu=atmega328old \
+         ~/Downloads/C210/10-firmware-gantian/SolderingStation2_C210_gantian
+     (kalau bootloader lama: cpu=atmega328old -> cpu=atmega328)
+
+  Pakai hex langsung (avrdude):
+     avrdude -c arduino -p atmega328p -P /dev/ttyUSB0 -b 57600 \
+        -U flash:w:$HOME/Downloads/C210/10-firmware-gantian/SolderingStation2_C210_gantian.hex:i
+     (gagal? coba baud 115200)
+
+  Atau XLoader: pilih file .hex di atas, device "Nano (ATmega328)", baud 57600.
+
+  Compile ulang sendiri (butuh library U8glib + PID ada di 02-firmware-c210.zip):
+     arduino-cli compile --fqbn arduino:avr:nano:cpu=atmega328old \
+        --libraries <folder-lib> ~/Downloads/C210/10-firmware-gantian/SolderingStation2_C210_gantian
+
+------------------------------------------------------------------------
+UJI WAJIB SESUDAH FLASH
+------------------------------------------------------------------------
+  1. Boot: menu Information -> harus tertulis Firmware: v1.3-C210g.
+  2. Gagang C210 (pin 5 kosong): slot tip harus "C210".
+     Gagang T210 (pin 5 ke GND): colok saat station hidup -> pindah ke "T210" + beep.
+  3. Setpoint 150 C dulu untuk gagang yang baru diwiring. Kalau suhu naik terus
+     tanpa berhenti: TC+ / TC- kebalik -> matikan, perbaiki wiring.
+  4. Kalibrasi per slot (Tip Settings -> Calibrate Tip) 200/280/360 C, Store = Yes.
+  5. FLT2: tarik kartrid saat heater ON -> heater mati + beep 2x + "FLT2".
+  6. FLT3: jangan pernah pasang adaptor 24 V (board ini 12 V only).
+  7. Ukur R kartrid tiap gagang, sesuaikan sekring (lihat 09-gantian-gagang.md).
+
+------------------------------------------------------------------------
+ROLLBACK
+------------------------------------------------------------------------
+  Flash 08-firmware-safefix/SolderingStation2_C210_safefix.hex
+  (kembali 1 slot tip, tanpa autodetect gagang).
