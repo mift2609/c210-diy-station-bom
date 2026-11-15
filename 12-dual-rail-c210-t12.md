@@ -29,6 +29,14 @@ solid state atau mekanik sama-sama boleh.
 
 Sumber angka: README proyek asal (Wagiminator) — tabel daya tip T12: 12 V = 1,50 A /
 18 W, 24 V = 3,00 A / 72 W; TC tip T12 ≈ 22 μV/°C.
+Board yang dipakai: silkscreen **"Wagiminator mod – Nano" / "C210 CTRL 12V"** —
+J1 +12V, J2 jumper (lepas saat flash), J4 OLED, J3 GX12-5 (P+/P-/E/SW/SP), FUSE 8A.
+Silk 8A itu justru **benar** untuk C210 di 12 V (~6 A); angka lama 8,5 Ω / 1,4 A yang
+salah. Untuk rail 24 V (T12, 3 A) sekring 8 A longgar tapi aman — kalau mau proteksi
+lebih rapat bisa diturunkan ke 5 A, asal rail 12 V tidak dipakai menembak C210.
+CATATAN: board ini berlabel 12 V — rail 24 V menuntut upgrade MOSFET ≥40 V + 5 V dari
+buck seperti di tabel bawah.
+
 Front-end: menurut issue #26 proyek asal, C210 "pretty much the same as T12 tip"
 (tap TC terpisah C210 tidak dipakai) → satu front-end melayani keduanya, yang
 berbeda hanya **tegangan rail + konstanta kalibrasi**.
@@ -49,8 +57,12 @@ Coil dari rail 5V (buck 5V, bukan 78M05 — lihat upgrade wajib).
 
 1. D2 (socket Nano) → modul relay IN. Sisi daya: COM → J1 (+), NC → buck 12V (+),
    NO → buck 24V (+). Buck 12V/24V ground disambung bareng (ground common PSU).
-2. D10 → pin 5 konektor gagang = ID. Gagang T12: pin 5 disambung ke GND **di dalam
-   gagang**. Gagang C210: pin 5 dibiarkan terbuka.
+2. ID gagang → **pin 5 konektor gagang = SP (spare)**. Jalur ini sudah ada di PCB
+   (silkscreen J3: `1:P+ 2:P- 3:E 4:SW 5:SP`; pin 4 = SW getar, pin 5 = SP dengan
+   trace + via sendiri). Tidak perlu edit gerber. Yang dikerjakan hanya di dalam
+   gagang: T12 → pin 5 ke GND; C210 → pin 5 terbuka.
+   Verifikasi saat board jadi: kontinuitas **J3 pin 5 ↔ socket Nano D10**
+   (sesuai komentar firmware: pin sisa board = D10).
 3. Kabel ID harus dibuat di dalam gagang, bukan di soket — kalau ID dipasang di
    soket, colok gagang yang salah = 24 V masuk ke kartrid C210.
 
@@ -84,7 +96,7 @@ kenaikan suhu — C210 di 24 V naik kira-kira 4× lebih cepat daripada T12 di 24
 | Relay SPDT 5V, kontak ≥6 A DC | pemilih rail 12/24 V |
 | Buck 24V ≥4 A dan buck 12V ≥8 A | PSU 36 V → modul **input ≥50 V** (mis. tipe 8-60V → 1-36V 15A 200W). XL4015/XL4016 mentok 36-40 V (datasheet XL4016: 5-40 V): **JANGAN** |
 | Sekring ikut R kartrid | C210 ~2 Ω → 8 A; T12 ~8 Ω → 3 A fast |
-| Kabel ID (D10 → pin 5) | autodetect |
+| ID gagang di dalam gagang (pin 5 = SP, jalur sudah ada di PCB) | autodetect; verifikasi kontinuitas SP ↔ D10 |
 
 ## Urutan uji (jangan dilompati)
 
@@ -109,7 +121,7 @@ kenaikan suhu — C210 di 24 V naik kira-kira 4× lebih cepat daripada T12 di 24
 | Buck 12V ≥8A (input ≥50V, mis. 8-60V 15A) | Rp60.000 – 100.000 |
 | Buck 5V (MP1584/MP2315) | Rp10.000 – 15.000 |
 | MOSFET ≥40V TO-252 | Rp10.000 – 20.000 |
-| Kabel ID + flywire D2 | ~Rp0 (sisa kabel) |
+| Kabel flywire D2 → relay IN (1 kabel) | ~Rp0 (sisa kabel) |
 
 Total tambahan ± Rp95.000 – Rp260.000 di atas rencana 12V-only.
 

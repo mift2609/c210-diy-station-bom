@@ -32,13 +32,20 @@ heater ngegas terus (runaway). Uji di setpoint 150 °C dulu, ukur pakai TC meter
 Firmware v1.3-C210g membaca pin **D10** (pin sisa di board ini — `SWITCH_PIN` sudah
 dipindah ke D3) dan memilih slot tip otomatis:
 
-| Gagang | Pin 5 konektor | D10 | Slot tip |
+| Gagang | Pin 5 konektor (SP) | D10 | Slot tip |
 |---|---|---|---|
 | C210 | kosong | HIGH (pull-up internal) | 0 → nama `C210` |
 | T210 | disambung ke GND | LOW | 1 → nama `T210` |
 
-Wiring: satu kabel dari socket Nano **D10** ke **pin 5** soket GX12 (di dalam
-enclosure). Di gagang T210, pin 5 disambung ke badan/ground gagang.
+**PCB sudah menyediakan jalurnya** — silkscreen J3 board: `1:P+  2:P-  3:E  4:SW  5:SP`.
+Pin 5 bernama **SP (spare)** dan pad-nya punya trace + via sendiri (sesuai komentar
+firmware: pin sisa board ini = D10). Jadi tidak perlu edit PCB: yang dikerjakan hanya
+**di dalam gagang** — gagang T210: pin 5 disambung ke badan/ground gagang;
+gagang C210: pin 5 dibiarkan terbuka.
+
+Verifikasi 5 detik saat board jadi (multimeter, station mati): kontinuitas
+**J3 pin 5 ↔ socket Nano D10**. Kalau ternyata SP bukan ke D10, tambah 1 flywire
+dari socket Nano D10 ke J3 pin 5 — tetap tidak perlu ubah gerber.
 
 Pembacaan di-*majority vote* 5 sampel biar tahan noise kontak, dan dicek ulang
 berkala saat station hidup (± 250 siklus baca) → colok gagang lain, display
@@ -121,7 +128,8 @@ PSU tetap **12V, floating/SELV**, jangan yang outputnya terhubung ke earth.
 | Item | Estimasi |
 |---|---|
 | Gagang kedua (soket T210 + kabel silikon 20AWG + GX12-5 + grip) | Rp60.000 – Rp150.000 |
-| Kabel flywire ID gagang (D10 → pin 5 GX12) | ~Rp0 (pakai sisa kabel) |
+| ID gagang: tidak ada belanja (pin 5 = SP sudah ada di PCB) | Rp0 |
+| Kalau perlu flywire D10→J3 pin 5 (hanya jika SP tidak ke D10) | ~Rp0 (sisa kabel) |
 
 ## File terkait
 

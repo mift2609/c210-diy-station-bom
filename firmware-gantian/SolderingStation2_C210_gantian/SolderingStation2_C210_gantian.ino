@@ -70,7 +70,10 @@
 // D10 menganggur di board ini (SWITCH_PIN dipindah ke D3). Dipakai sebagai ID
 // gagang: gagang T210 menyambung D10 ke GND lewat kabel pin 5 konektor gagang,
 // gagang C210 membiarkannya terbuka (pull-up internal).
-#define HANDLE_ID_PIN  10       // pin ID gagang (flywire dari socket Nano pin D10)
+#define HANDLE_ID_PIN  10       // pin ID gagang. Silk PCB: J3 pin 5 = "SP" (spare) dan
+                                 // pad-nya punya jalur+via -> hampir pasti ke D10. Pakai
+                                 // jumper/ID di dalam gagang. Kalau ternyata SP tidak ke D10,
+                                 // cukup 1 flywire dari socket Nano D10 ke J3 pin 5.
 #define TIP_ID_LOW      1       // slot tip saat ID ditarik LOW (gagang T210)
 #define TIP_ID_HIGH     0       // slot tip saat ID terbuka (gagang C210)
 #define TIP_AUTOSELECT true     // false = pilih tip manual di menu Tip Settings
