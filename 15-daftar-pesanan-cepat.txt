@@ -1,0 +1,26 @@
+DAFTAR PESANAN CEPAT (station solder C210/T12) — tempel ke seller
+
+1) KOMPONEN (1 seller):
+kit resistor 0805; kit cap 1206; cap 10uF/35V,22uF/35V,1uF/35V,2n2; LMV358 SOIC-8;
+FMMT619 SOT-23; IRLR7843 TO-252; 78M05 TO-252; SS54 SMA; 1N4148W SOD-123; zener 5V1 SOD-123;
+Arduino Nano V3; OLED 0.96 SSD1306 I2C; encoder EC11+knob; buzzer 5030 passive;
+pin header female 1x40; pin header male 1x2+jumper; sekring 5x20 8A+klip; SW-520D.
+
+2) MODUL (1 seller):
+XL4016 8A XH-M404; XL4015 5A CC/CV; MP1584; modul relay 5V 1ch 10A;
+KF350 2pin x6; KF350 5pin; GX12-5 male+female; fan 12V 60x60x25; termostat bimetal 45C.
+
+3) SOLDERING (1 seller):
+soket/gagang T210; kartrid C210 (mechanic/maant/relife); stand besi+sponge;
+kabel silikon 20AWG 4-5 core; kabel silikon 18AWG.
+
+4) LOKAL/OFFLINE (Glodok / toko listrik):
+PVC 3mm; standoff+sekrup M3; mesh filter; kabel 220V + strain relief; sekring inline 3A slow;
+heat shrink/sleeving.
+
+PESAN PCB (JLCPCB/PCBWay): 2 board 2-layer 1.6mm HASL —
+(a) station C210 100x70 (pakai 01b-gerber-c210-maskfix.zip)
+(b) power v2 140x90 (pakai 13-pcb-power/c210-power-v2-gerber.zip)
+
+URUTAN: order PCB dulu -> modul -> komponen -> gagang -> mekanik.
+CATATAN SEBELUM NYALA: ukur R kartrid (I=12/R) & output PSU 36V; set J3=12,0V, J5=24,0V.
