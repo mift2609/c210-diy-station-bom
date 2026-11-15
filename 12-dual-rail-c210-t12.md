@@ -122,6 +122,32 @@ Alternatif tanpa relay: **saklar SPDT manual ≥6 A DC** (Rp10-20 rb) yang memil
 buck 12 V atau buck 24 V. Otomatisnya hilang, tapi FLT3 tetap jadi penjaga: profil
 C210 (rail 12 V) yang diberi 24 V langsung mengunci pemanas.
 
+## Kalau pakai modul XL4015 (5A)
+
+Fakta (datasheet XL4015 Rev 2.0): IC berlabel "5A 180KHz **36V** Buck", input 8-36 V,
+abs max 40 V; output 1,25-32 V; modul komersial ditulis 5-36 V (ada yang 4-38 V).
+"0-5 A" itu rating IC; kontinu realistis 3-4 A dengan heatsink.
+
+| Rail | Kartrid | Arus | XL4015 |
+|---|---|---|---|
+| 24 V (T12) | 8 ohm | 3,0 A | cukup, lega |
+| 12 V (C210) | 2 ohm | 6,0 A | **tidak cukup** |
+| 12 V (C210 klon) | 2,5 ohm | 4,8 A | pinggir |
+| 12 V (C210 klon) | 3 ohm | 4,0 A | cukup tanpa margin |
+
+Aturan:
+1. Input 36 V = tepat di batas rating IC (margin nol). Cek trimpot di board PSU:
+   kalau output bisa diturunkan ke ~30 V, XL4015 aman dan 24 V out masih tercapai
+   (dropout XL4015 ~1,5-2 V).
+2. Rail 24 V (T12): XL4015 aman.
+3. Rail 12 V (C210): pakai versi **CC/CV** (ada pot arus), set limit ~5 A -> tip panas
+   lebih lambat (4 A x 12 V = 48 W, dari 72 W) tapi modul tidak mati. Mau panas penuh
+   dengan kartrid 2 ohm: pakai modul >= 8 A dengan input >= 50 V.
+4. Jangan paralel dua XL4015 untuk menambah arus: tanpa load sharing, satu modul
+   menanggung hampir semua beban.
+5. Board power (13-pcb-power) TIDAK perlu diubah: slot-nya terminal block, modul apa
+   pun bisa dipasang.
+
 ## Urutan uji (jangan dilompati)
 
 1. Pasang relay + 2 buck, **belum** pasang gagang. Ukur: NC = 12 V, NO = 24 V di J1.
